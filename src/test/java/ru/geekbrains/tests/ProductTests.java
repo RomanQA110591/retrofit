@@ -89,6 +89,17 @@ public class ProductTests {
 
 
     @Test
+        //Нахождение товара по неактуальному ID
+    void getProductIdNegativeTest() throws IOException {
+        Response<Product> response = productService
+                .getProduct(incorrectId)
+                .execute();
+        assertThat(response.code(), equalTo(404));
+    }
+
+
+
+    @Test
         //Чтение списка всех продуктов
     void getListAllProductsTest() throws IOException {
         Response<List<Product>> response = productService
@@ -111,7 +122,7 @@ public class ProductTests {
 
     @Test
         //Нахождение категории по неактуальному ID
-    void getCategoryWrongIdTest() throws IOException {
+    void getCategoryIdTest() throws IOException {
         Integer id = irrelevantCategoryId;
         Response<Category> response = categoryService
                 .getCategory(id)
@@ -143,6 +154,26 @@ public class ProductTests {
     void createProductLongTitleTest() throws IOException {
         Response<Product> response = productService
                 .createProduct(new Product().withTitle(faker.lorem().fixedString(5555)))
+                .execute();
+        Objects.requireNonNull(response.errorBody()).string();
+        assertThat(response.code(), equalTo(500));
+    }
+
+    @Test
+        //Создать продукт с нулевой ценой
+    void createProductZeroPriceTest() throws IOException {
+        Response<Product> response = productService
+                .createProduct(new Product().withPrice((zeroPrice)))
+                .execute();
+        Objects.requireNonNull(response.errorBody()).string();
+        assertThat(response.code(), equalTo(500));
+    }
+
+    @Test
+        //Создать продукт с отрицательной ценой
+    void createProductMinusPriceTest() throws IOException {
+        Response<Product> response = productService
+                .createProduct(new Product().withPrice((minusPrice)))
                 .execute();
         Objects.requireNonNull(response.errorBody()).string();
         assertThat(response.code(), equalTo(500));
